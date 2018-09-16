@@ -1,0 +1,12 @@
+name="swoole-server"
+
+docker stop $name
+docker rm $name
+
+docker run \
+--name $name \
+--network "web" \
+-v $PWD/www/server:/usr/app \
+-d \
+ldjbenben/swoole:4.1-php7.2-cli \
+php /usr/app/index.php

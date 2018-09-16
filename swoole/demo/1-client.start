@@ -1,0 +1,11 @@
+name="swoole-client"
+
+docker stop $name
+docker rm $name
+
+docker run \
+-d \
+--name $name \
+--network 'web' \
+-v "$PWD/www/client":/var/www/html \
+ldjbenben/swoole:4.1-php7.2-fpm

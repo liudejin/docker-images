@@ -1,0 +1,2 @@
+docker build -t ldjbenben/swoole:4.1-php7.2-cli .
+docker push ldjbenben/swoole:4.1-php7.2-cli
