@@ -52,5 +52,3 @@ nginx:alpine
 If your server ip is '192.168.2.100' you can access 'http://192.168.2.100:8080' in the browser to see the result.
 
 The browser will output ‘Hello Swoole!’ if everything is ok.
-
-Now you can access the domain name '[http://swooleclient.demo.com:8090](http://swooleclient.demo.com:8090)' to see the result.
