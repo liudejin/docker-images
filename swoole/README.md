@@ -47,6 +47,7 @@ docker run \
 -v `pwd`/nginx.conf:/etc/nginx/nginx.conf:ro \
 -d \
 nginx:alpine
+```
 
 If your server ip is '192.168.2.100' you can access 'http://192.168.2.100:8080' in the browser to see the result.
 
