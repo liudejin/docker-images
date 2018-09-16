@@ -1,0 +1,8 @@
+The all of images are based on alpine linux so their sizes are very small.
+
+## Supported tags
+
+
+- 4.1-php7.2-cli
+
+- 4.1-php7.2-fpm
