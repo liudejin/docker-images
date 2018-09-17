@@ -49,6 +49,7 @@ docker run \
 nginx:alpine
 ```
 
+
 If your server ip is '192.168.2.100' you can access 'http://192.168.2.100:8080' in the browser to see the result.
 
 The browser will output ‘Hello Swoole!’ if everything is ok.
