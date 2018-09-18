@@ -8,3 +8,5 @@ if (!$client->connect('swoole-server-demo', 9501, -1))
 $client->send("Hello Swoole!\n");
 echo $client->recv();
 $client->close();
+
+phpinfo();

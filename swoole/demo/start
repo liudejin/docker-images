@@ -1,3 +1,0 @@
-./0-server.start && \
-./1-client.start && \
-./2-nginx.start
