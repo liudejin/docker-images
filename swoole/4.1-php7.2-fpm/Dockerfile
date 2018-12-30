@@ -1,4 +1,4 @@
-FROM php:7.2.9-fpm-alpine3.8
+FROM ldjbenben/php:7.2-fpm-alpine
 
 ENV PHPIZE_DEPS \
 	autoconf \

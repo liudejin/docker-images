@@ -1,4 +1,12 @@
+FROM alpine/git:latest
+
+RUN cd /usr && git clone https://github.com/viest/php-ext-excel-export.git
+
+
 FROM php:7.2.9-cli-alpine3.8
+
+COPY --from=0 /usr/php-ext-excel-export /usr/src/php/ext/php-ext-excel-export/
+
 
 COPY files /usr/src/
 
@@ -120,6 +128,33 @@ RUN set -xe \
 && docker-php-ext-enable gd \
 && rm -rf /usr/src/libpng-1.6.34.tar.gz \
 && rm -rf /usr/src/libpng \
+\ 
+#============= Enable pdo_mysql ======================
+        && ( \
+                cd /usr/src/php/ext/pdo_mysql \
+                && phpize \
+                && ./configure \
+                && make && make install \
+                && docker-php-ext-enable pdo_mysql \
+        ) \
+\
+\
+# ================================ Redis ======================
+&& pecl install redis \
+&& docker-php-ext-enable redis \
+\
+\
+# =============================== Inotify ======================
+&& pecl install inotify \
+&& docker-php-ext-enable inotify \
+\
+\
+# ============================== xlswriter =======================
+&& cd /usr/src/php/ext/php-ext-excel-export \
+&& phpize \
+&& ./configure \
+&& make && make install \
+&& docker-php-ext-enable xlswriter \
 \
 \
 && apk del .build-deps \

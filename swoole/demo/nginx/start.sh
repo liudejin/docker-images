@@ -11,5 +11,7 @@ docker run \
 -v $PWD/../swoole-client-demo/src:/usr/share/nginx/html/swoole-client-demo \
 -v `pwd`/conf.d:/usr/share/nginx/conf.d \
 -v `pwd`/nginx.conf:/etc/nginx/nginx.conf:ro \
--d \
+-v `pwd`/logs:/usr/share/nginx/logs \
+-it \
 nginx:alpine
+#-d \
