@@ -3,23 +3,25 @@ FROM alpine/git:latest
 RUN cd /usr && git clone https://github.com/viest/php-ext-excel-export.git
 
 
-FROM php:7.2-fpm-alpine3.8
+FROM php:7.3-fpm-alpine3.8
 
 COPY --from=0 /usr/php-ext-excel-export /usr/src/php/ext/php-ext-excel-export/
 COPY files /usr/src/
+COPY docker-php.ini /usr/local/etc/php/conf.d/
 
 ENV PHPIZE_DEPS \
         autoconf \
 	gcc \
         g++ \
         make \
+	cmake \
         libxml2-dev \
 	openssl-dev \
         pcre-dev \
 	freetype-dev
 
 RUN set -xe \
-	 && echo 'http://mirrors.aliyun.com/alpine/v3.8/main/' > /etc/apk/repositories \
+	&& echo 'http://mirrors.aliyun.com/alpine/v3.8/main/' > /etc/apk/repositories \
         && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         && docker-php-source extract \
@@ -42,7 +44,12 @@ RUN set -xe \
         ) \
 #============= Enable zip ======================
        	&& ( \
-               	cd /usr/src/php/ext/zip \
+		cd /usr/src \
+		&& mkdir libzip \
+		&& tar xf libzip-1.5.1.tar.gz -C libzip --strip-components=1 \
+		&& cd libzip && mkdir build && cd build \
+		&& cmake .. && make && make install \
+               	&& cd /usr/src/php/ext/zip \
                 && phpize \
        	        && ./configure --enable-zip \
                 && make && make install \
@@ -153,3 +160,4 @@ RUN set -xe \
 && pecl update-channels \
 && rm -rf /tmp/pear ~/.pearrc \
 && docker-php-source delete
+

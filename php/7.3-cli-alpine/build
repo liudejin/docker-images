@@ -1,0 +1,2 @@
+docker build -t ldjbenben/php:7.3-cli-alpine .
+docker push ldjbenben/php:7.3-cli-alpine
