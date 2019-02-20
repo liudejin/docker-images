@@ -1,13 +1,8 @@
-FROM alpine/git:latest
-
-RUN cd /usr && git clone https://github.com/viest/php-ext-excel-export.git
-
-
 FROM php:7.3-cli-alpine3.8
 
-COPY --from=0 /usr/php-ext-excel-export /usr/src/php/ext/php-ext-excel-export/
 COPY files /usr/src/
 COPY docker-php.ini /usr/local/etc/php/conf.d/
+
 
 ENV PHPIZE_DEPS \
         autoconf \
@@ -18,14 +13,25 @@ ENV PHPIZE_DEPS \
         libxml2-dev \
 	openssl-dev \
         pcre-dev \
-	freetype-dev
+	freetype-dev \
+	zlib-dev
 
 RUN set -xe \
 	&& echo 'http://mirrors.aliyun.com/alpine/v3.8/main/' > /etc/apk/repositories \
         && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
+	&& echo 'http://mirrors.aliyun.com/alpine/v3.8/community/' > /etc/apk/repositories \
+	&& apk add libzip-dev \
         && docker-php-source extract \
 \
+#============= Enable soap ======================
+       	&& ( \
+               	cd /usr/src/php/ext/soap \
+                && phpize \
+       	        && ./configure --enable-soap \
+                && make && make install \
+       	        && docker-php-ext-enable soap \
+        ) \
 #============= Enable bcmath ======================
        	&& ( \
                	cd /usr/src/php/ext/bcmath \
@@ -44,12 +50,7 @@ RUN set -xe \
         ) \
 #============= Enable zip ======================
        	&& ( \
-		cd /usr/src \
-		&& mkdir libzip \
-		&& tar xf libzip-1.5.1.tar.gz -C libzip --strip-components=1 \
-		&& cd libzip && mkdir build && cd build \
-		&& cmake .. && make && make install \
-               	&& docker-php-ext-install zip \
+       	        docker-php-ext-install zip \
         ) \
 #============= Enable openssl ====================
 	&& ( \
@@ -145,10 +146,7 @@ RUN set -xe \
 \
 \
 # ============================== xlswriter =======================
-&& cd /usr/src/php/ext/php-ext-excel-export \
-&& phpize \
-&& ./configure \
-&& make && make install \
+&& pecl install xlswriter \
 && docker-php-ext-enable xlswriter \
 \
 \
@@ -156,4 +154,3 @@ RUN set -xe \
 && pecl update-channels \
 && rm -rf /tmp/pear ~/.pearrc \
 && docker-php-source delete
-

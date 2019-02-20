@@ -1,0 +1,42 @@
+#FROM alpine/git:latest
+
+#RUN cd /usr && git clone https://github.com/viest/php-ext-excel-export.git
+
+
+FROM php:7.3-cli-alpine3.8
+
+#COPY --from=0 /usr/php-ext-excel-export /usr/src/php/ext/php-ext-excel-export/
+COPY files /usr/src/
+COPY docker-php.ini /usr/local/etc/php/conf.d/
+
+ENV PHPIZE_DEPS \
+        autoconf \
+	gcc \
+        g++ \
+        make \
+	cmake \
+        libxml2-dev \
+	openssl-dev \
+        pcre-dev \
+	freetype-dev \
+	zlib-dev
+
+RUN set -xe \
+	&& echo 'http://mirrors.aliyun.com/alpine/v3.8/main/' > /etc/apk/repositories \
+	&& apk add --no-cache --virtual .persistent-deps \
+		libzip-dev --repository http://dl-cdn.alpinelinux.org/alpine/v3.8/community/
+
+RUN set -xe \
+        && apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
+        && docker-php-source extract \
+\
+#============= Enable zip ======================
+       	&& ( \
+		docker-php-ext-install zip \
+	) \
+&& apk del .build-deps \
+# && pecl update-channels \
+&& rm -rf /tmp/pear ~/.pearrc \
+&& docker-php-source delete
+
