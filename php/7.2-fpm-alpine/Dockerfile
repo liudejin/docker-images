@@ -14,19 +14,89 @@ ENV PHPIZE_DEPS \
         g++ \
         make \
         libxml2-dev \
-	openssl-dev \
         pcre-dev \
 	freetype-dev
+
+ENV PHPIZE_DEPS_PERSIST \
+	gettext-dev \
+	imagemagick-dev \
+	rabbitmq-c-dev \
+	libintl
 
 RUN set -xe \
 	 && echo 'http://mirrors.aliyun.com/alpine/v3.8/main/' > /etc/apk/repositories \
         && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
+        && apk add --no-cache --virtual .build-deps-persist\
+	$PHPIZE_DEPS_PERSIST \
         && docker-php-source extract \
 \
+#========================= msgpack ==========================
+&& pecl install msgpack \
+&& docker-php-ext-enable msgpack \
+#========================= protobuf ==========================
+&& pecl install protobuf \
+&& docker-php-ext-enable protobuf \
+#========================= imagick ==========================
+&& pecl install imagick \
+&& docker-php-ext-enable imagick \
+#========================= igbinary ==========================
+&& pecl install igbinary \
+&& docker-php-ext-enable igbinary \
+#========================= Amqp ==========================
+&& pecl install amqp \
+&& docker-php-ext-enable amqp \
 #========================= Mongodb ==========================
 && pecl install mongodb \
 && docker-php-ext-enable mongodb \
+#============= Enable mysqli ======================
+        && ( \
+                cd /usr/src/php/ext/mysqli \
+                && phpize \
+                && ./configure --with-mysqli \
+                && make && make install \
+                && docker-php-ext-enable mysqli \
+        ) \
+#============= Enable xmlrpc ======================
+        && ( \
+                cd /usr/src/php/ext/xmlrpc \
+                && phpize \
+                && ./configure --with-xmlrpc \
+                && make && make install \
+                && docker-php-ext-enable xmlrpc \
+        ) \
+#============= Enable sysvsem ======================
+        && ( \
+                cd /usr/src/php/ext/sysvsem \
+                && phpize \
+                && ./configure --enable-sysvsem \
+                && make && make install \
+                && docker-php-ext-enable sysvsem \
+        ) \
+#============= Enable shmop ======================
+        && ( \
+                cd /usr/src/php/ext/shmop \
+                && phpize \
+                && ./configure --enable-shmop \
+                && make && make install \
+                && docker-php-ext-enable shmop \
+        ) \
+#============= Enable pcntl ======================
+        && ( \
+                cd /usr/src/php/ext/pcntl \
+                && phpize \
+                && ./configure --enable-pcntl \
+                && make && make install \
+                && docker-php-ext-enable pcntl \
+        ) \
+#============= Enable gettext ======================
+        && ( \
+                cd /usr/src/php/ext/gettext \
+                && phpize \
+                && ./configure --with-gettext \
+                && make && make install \
+                && docker-php-ext-enable gettext \
+        ) \
 #============= Enable bcmath ======================
        	&& ( \
                	cd /usr/src/php/ext/bcmath \
@@ -145,10 +215,7 @@ RUN set -xe \
 \
 \
 # ============================== xlswriter =======================
-&& cd /usr/src/php/ext/php-ext-excel-export \
-&& phpize \
-&& ./configure \
-&& make && make install \
+&& pecl install xlswriter \
 && docker-php-ext-enable xlswriter \
 \
 \
