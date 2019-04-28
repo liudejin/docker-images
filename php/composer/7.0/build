@@ -1,0 +1,3 @@
+docker build -t ldjbenben/php:7.0-composer .
+
+docker push ldjbenben/php:7.0-composer

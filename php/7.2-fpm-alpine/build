@@ -1,2 +1,2 @@
 docker build -t ldjbenben/php:7.2-fpm-alpine .
-docker push ldjbenben/php:7.2-fpm-alpine
+#docker push ldjbenben/php:7.2-fpm-alpine

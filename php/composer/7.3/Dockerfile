@@ -1,4 +1,4 @@
-FROM ldjbenben/php:7.3-fpm-alpine
+FROM ldjbenben/php:7.3-cli-alpine
 
 RUN \
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \

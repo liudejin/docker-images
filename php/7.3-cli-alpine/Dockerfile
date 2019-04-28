@@ -20,12 +20,22 @@ RUN set -xe \
 	&& echo 'http://mirrors.aliyun.com/alpine/v3.8/main/' > /etc/apk/repositories \
         && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
+	&& apk add bzip2-dev \
 	&& echo 'http://mirrors.aliyun.com/alpine/v3.8/community/' > /etc/apk/repositories \
 	&& apk add libzip-dev \
         && docker-php-source extract \
+ \
+#============= Enable bz2 ======================
+        && ( \
+               	cd /usr/src/php/ext/bz2 \
+                && phpize \
+       	        && ./configure --with-bz2 \
+                && make && make install \
+       	        && docker-php-ext-enable bz2 \
+        ) \
 \
 #============= Enable soap ======================
-       	&& ( \
+        && ( \
                	cd /usr/src/php/ext/soap \
                 && phpize \
        	        && ./configure --enable-soap \

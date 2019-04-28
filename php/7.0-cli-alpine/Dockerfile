@@ -1,32 +1,47 @@
-FROM alpine/git:latest
+FROM php:7.0-cli-alpine3.7
 
-RUN cd /usr && git clone https://github.com/viest/php-ext-excel-export.git
-
-
-FROM php:7.2-fpm-alpine3.8
-
-COPY --from=0 /usr/php-ext-excel-export /usr/src/php/ext/php-ext-excel-export/
 COPY files /usr/src/
+COPY docker-php.ini /usr/local/etc/php/conf.d/
+
 
 ENV PHPIZE_DEPS \
         autoconf \
 	gcc \
         g++ \
         make \
+	cmake \
         libxml2-dev \
 	openssl-dev \
         pcre-dev \
-	freetype-dev
+	freetype-dev \
+	zlib-dev
 
 RUN set -xe \
-	 && echo 'http://mirrors.aliyun.com/alpine/v3.8/main/' > /etc/apk/repositories \
+	&& echo 'http://mirrors.aliyun.com/alpine/v3.7/main/' > /etc/apk/repositories \
         && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
+	&& apk add bzip2-dev \
+	&& echo 'http://mirrors.aliyun.com/alpine/v3.7/community/' > /etc/apk/repositories \
+	&& apk add libzip-dev \
         && docker-php-source extract \
+ \
+#============= Enable bz2 ======================
+        && ( \
+               	cd /usr/src/php/ext/bz2 \
+                && phpize \
+       	        && ./configure --with-bz2 \
+                && make && make install \
+       	        && docker-php-ext-enable bz2 \
+        ) \
 \
-#========================= Mongodb ==========================
-&& pecl install mongodb \
-&& docker-php-ext-enable mongodb \
+#============= Enable soap ======================
+        && ( \
+               	cd /usr/src/php/ext/soap \
+                && phpize \
+       	        && ./configure --enable-soap \
+                && make && make install \
+       	        && docker-php-ext-enable soap \
+        ) \
 #============= Enable bcmath ======================
        	&& ( \
                	cd /usr/src/php/ext/bcmath \
@@ -45,11 +60,7 @@ RUN set -xe \
         ) \
 #============= Enable zip ======================
        	&& ( \
-               	cd /usr/src/php/ext/zip \
-                && phpize \
-       	        && ./configure --enable-zip \
-                && make && make install \
-       	        && docker-php-ext-enable zip \
+       	        docker-php-ext-install zip \
         ) \
 #============= Enable openssl ====================
 	&& ( \
@@ -145,10 +156,7 @@ RUN set -xe \
 \
 \
 # ============================== xlswriter =======================
-&& cd /usr/src/php/ext/php-ext-excel-export \
-&& phpize \
-&& ./configure \
-&& make && make install \
+&& pecl install xlswriter \
 && docker-php-ext-enable xlswriter \
 \
 \

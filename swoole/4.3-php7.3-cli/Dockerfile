@@ -1,6 +1,6 @@
 FROM alpine/git:latest
 
-RUN cd /usr && git clone https://github.com/swoole/swoole-src.git && cd swoole-src && git checkout -b v4.2.9 v4.2.9
+RUN cd /usr && git clone -b v4.3.1 https://gitee.com/swoole/swoole.git swoole-src
 
 
 FROM ldjbenben/php:7.3-cli-alpine
@@ -44,10 +44,3 @@ RUN set -xe \
 && rm -rf /tmp/pear ~/.pearrc \
 && cd / \
 && docker-php-source delete
-
-RUN \
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-&& php composer-setup.php \
-&& php -r "unlink('composer-setup.php');" \
-&& mv composer.phar /usr/local/bin/composer \
-&& composer config -g repo.packagist composer https://packagist.laravel-china.org
